@@ -1,32 +1,37 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <v-header />
     <router-view/>
+    <v-footer />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import VHeader from '@/components/v-header'
+import VFooter from '@/components/v-footer'
 
-#nav {
-  padding: 30px;
+export default {
+  name: 'App',
+  components: {
+    VHeader,
+    VFooter,
+  },
 }
+</script>
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+<style lang="sass">
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+*
+  margin: 0
+  padding: 0
+
+a
+  text-decoration: none
+  font-family: Montserrat, sans-serif
+
+li
+  list-style-type: none
+
+body
+  font-family: Montserrat, sans-serif
 </style>
