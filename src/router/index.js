@@ -10,6 +10,7 @@ const routes = [
     path: '/',
     name: 'Form',
     component: Form,
+    props: true,
   },
   {
     path: '/preview',

@@ -13,7 +13,8 @@
     >
       <template
         v-if="!personData.name.valid"
-        #error>
+        #error
+      >
         <span class="form__field-error">
           {{ personData.name.value.length ? 'Имя должно содержать буквы' : 'Поле обязательно к заполнению' }}
         </span>
@@ -22,7 +23,7 @@
 
     <v-input
       type="number"
-      v-model="personData.age.value"
+      v-model.number="personData.age.value"
       :class="['form__field', personData.age.valid ? '' : 'invalid']"
       :class-name="'form__input'"
       :label="'Возраст'"
@@ -30,9 +31,10 @@
     >
       <template
         v-if="!personData.age.valid"
-        #error>
+        #error
+      >
         <span class="form__field-error">
-          {{ personData.age.value.length ? 'Возраст не может быть больше 100' : 'Поле обязательно к заполнению' }}
+          {{ !!personData.age.value ? 'Возраст не может быть больше 100' : 'Поле обязательно к заполнению' }}
         </span>
       </template>
     </v-input>
@@ -79,7 +81,7 @@
 
       <v-input
         type="number"
-        v-model="child.age.value"
+        v-model.number="child.age.value"
         :class="['form__field', child.age.valid ? '' : 'invalid']"
         :class-name="'form__input'"
         :label="'Возраст'"
@@ -87,7 +89,8 @@
       >
         <template
           v-if="!child.age.valid"
-          #error>
+          #error
+        >
         <span class="form__field-error">
           {{ child.age.value.length ? 'Имя должно содержать буквы' : 'Поле обязательно к заполнению' }}
         </span>
@@ -101,7 +104,6 @@
         Удалить
       </p>
     </div>
-
   </section>
 
   <button
@@ -116,12 +118,20 @@
 
 <script>
 import VInput from '@/components/v-input'
+import { userDataAdapter } from '@/components/consts'
 
 export default {
   name: 'Form',
 
   components: {
     VInput,
+  },
+
+  props: {
+    userData: {
+      type: Object,
+      required: true,
+    },
   },
 
   data () {
@@ -181,31 +191,38 @@ export default {
 
     submit () {
       if (this.validateForm()) {
-        this.$emit('save-person', { ...this.personData, children: [...this.personChildren] })
+        this.$emit('save-person', userDataAdapter.toClient({ ...this.personData, children: this.personChildren }))
       }
     },
 
     validateName (name) {
       name.valid = /[а-яёА-ЯЁa-zA-Z ]/g.test(name.value)
-      return name.valid
     },
 
     validateAge (age) {
-      age.valid = age.value.length && parseInt(age.value) < 100
-      return age.valid
+      age.valid = !!age.value && age.value < 100
     },
 
     validateForm () {
-      let result = this.validateName(this.personData.name) && this.validateAge(this.personData.age)
+      this.validateName(this.personData.name)
+      this.validateAge(this.personData.age)
+      let result = this.personData.name.valid && this.personData.age.valid
 
       this.personChildren.forEach((child) => {
-        if (result) {
-          result = this.validateName(child.name) && this.validateAge(child.age)
-        }
+        this.validateName(child.name)
+        this.validateAge(child.age)
+        result = child.name.valid && child.age.valid ? result : false
       })
 
       return result
     },
+  },
+
+  mounted () {
+    const { personData, personChildren } = userDataAdapter.toForm(this.userData)
+
+    this.personData = personData
+    this.personChildren = personChildren
   },
 }
 </script>
